@@ -1,31 +1,11 @@
 # CI/CD Pipeline - Escola App
 
-Este repositório contém as configurações de CI/CD para o projeto Escola App, que consiste em uma aplicação frontend e backend.
+Este repositório contém as configurações de produção para o projeto Escola App.
 
 ## Estrutura do Projeto
 
-- `frontend/`: Configurações de CI/CD para o frontend (Angular)
-- `backend/`: Configurações de CI/CD para o backend (Spring Boot)
-
-## Workflows
-
-### Frontend
-- Build e teste da aplicação Angular
-- Push da imagem Docker para o DockerHub
-- Deploy automático
-
-### Backend
-- Build e teste da aplicação Spring Boot
-- Push da imagem Docker para o DockerHub
-- Deploy automático
-
-## Requisitos
-
-- GitHub Actions
-- DockerHub
-- Acesso aos repositórios:
-  - Frontend: carlinhoshk/escola-frontend
-  - Backend: carlinhoshk/escola-app
+- `docker-compose.prod.yml`: Configuração de produção com Docker Compose
+- `.github/workflows/`: Configurações de deploy em produção
 
 ## Configuração
 
@@ -40,4 +20,21 @@ Este repositório contém as configurações de CI/CD para o projeto Escola App,
 
 ## Uso
 
-Os workflows são executados automaticamente quando há push para as branches principais dos repositórios frontend e backend. 
+O deploy em produção é acionado automaticamente quando há sucesso nos workflows de CI/CD dos repositórios:
+- Frontend: carlinhoshk/escola-frontend
+- Backend: carlinhoshk/escola-app
+
+## Serviços
+
+### Backend
+- Porta: 9090
+- Imagem: carlinhoshk/escola-app:latest
+
+### Frontend
+- Porta: 4200
+- Imagem: carlinhoshk/escola-frontend:latest
+
+### Banco de Dados
+- MariaDB 10.11
+- Porta: 3306
+- Volume: mariadb_data 
