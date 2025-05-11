@@ -1,0 +1,23 @@
+image: gitpod/workspace-full
+
+ports:
+  - port: 9090
+    onOpen: open-preview
+  - port: 4200
+    onOpen: open-preview
+  - port: 3306
+
+tasks:
+  - name: Start Docker Compose
+    command: |
+      docker-compose -f docker-compose.prod.yml up -d
+    init: |
+      echo "Iniciando ambiente de desenvolvimento..."
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+    - angular.ng-template
+    - dbaeumer.vscode-eslint
+    - esbenp.prettier-vscode
+    - ms-azuretools.vscode-docker 
