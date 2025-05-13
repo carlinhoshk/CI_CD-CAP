@@ -5,14 +5,14 @@ services:
     container_name: escola_backend
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/escola
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
       SPRING_FLYWAY_ENABLED: true
       SPRING_FLYWAY_URL: jdbc:mariadb://mariadb:3306/escola
-      SPRING_FLYWAY_USER: ${DB_USER}
-      SPRING_FLYWAY_PASSWORD: ${DB_PASSWORD}
+      SPRING_FLYWAY_USER: user
+      SPRING_FLYWAY_PASSWORD: password
       SPRING_PROFILES_ACTIVE: prod
-      JAVA_OPTS: "-Xms256m -Xmx512m -XX:+UseG1GC"
+      JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     depends_on:
       mariadb:
         condition: service_healthy
@@ -24,11 +24,11 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '1'
+          memory: 1.5G
+        reservations:
           cpus: '0.5'
           memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
 
   frontend:
     image: carlinhoshk/escola-frontend:latest
@@ -41,31 +41,34 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: 256M
+          cpus: '0.5'
+          memory: 512M
         reservations:
-          cpus: '0.1'
-          memory: 128M
+          cpus: '0.2'
+          memory: 256M
 
   mariadb:
     image: mariadb:10.11
     container_name: escola_db
     environment:
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: escola
-      MARIADB_USER: ${DB_USER}
-      MARIADB_PASSWORD: ${DB_PASSWORD}
-      MARIADB_INNODB_BUFFER_POOL_SIZE: 256M
+      MARIADB_USER: user
+      MARIADB_PASSWORD: password
+      MARIADB_INNODB_BUFFER_POOL_SIZE: 512M
       MARIADB_MAX_CONNECTIONS: 50
+      MARIADB_INNODB_LOG_FILE_SIZE: 64M
+      MARIADB_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 2
+      MARIADB_INNODB_FLUSH_METHOD: O_DIRECT
     ports:
       - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --innodb-buffer-pool-size=512M --innodb-log-file-size=64M --innodb-flush-log-at-trx-commit=2 --innodb-flush-method=O_DIRECT
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USER}", "-p${DB_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,11 +76,11 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
           cpus: '0.5'
           memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
 
 networks:
   app-network:
