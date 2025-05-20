@@ -8,11 +8,21 @@ ports:
   - port: 3306
 
 tasks:
-  - name: Start Docker Compose
+  - name: Start MariaDB
     command: |
-      docker-compose -f docker-compose.prod.yml up -d
+      docker-compose -f docker-compose.gitpod.yml up -d
     init: |
-      echo "Iniciando ambiente de desenvolvimento..."
+      echo "Iniciando banco de dados MariaDB..."
+  - name: Start Backend
+    command: |
+      cd backend && ./mvnw spring-boot:run
+    init: |
+      echo "Iniciando backend Spring Boot..."
+  - name: Start Frontend
+    command: |
+      cd frontend && npx ng serve --host 0.0.0.0 --port 8080
+    init: |
+      echo "Iniciando frontend Angular..."
 
 vscode:
   extensions:
@@ -20,4 +30,4 @@ vscode:
     - angular.ng-template
     - dbaeumer.vscode-eslint
     - esbenp.prettier-vscode
-    - ms-azuretools.vscode-docker 
+    - ms-azuretools.vscode-docker

@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: escola_db
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: escola
+      MARIADB_USER: user
+      MARIADB_PASSWORD: password
+      MARIADB_INNODB_BUFFER_POOL_SIZE: 512M
+      MARIADB_MAX_CONNECTIONS: 50
+      MARIADB_INNODB_LOG_FILE_SIZE: 64M
+      MARIADB_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 2
+      MARIADB_INNODB_FLUSH_METHOD: O_DIRECT
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --innodb-buffer-pool-size=512M --innodb-log-file-size=64M --innodb-flush-log-at-trx-commit=2 --innodb-flush-method=O_DIRECT
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
