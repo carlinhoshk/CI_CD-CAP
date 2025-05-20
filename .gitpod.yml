@@ -1,15 +1,6 @@
 image: gitpod/workspace-full
 
 tasks:
-  - name: Setup MariaDB
-    init: |
-      # Aguarda o banco ficar saudável
-      echo "Aguardando MariaDB..."
-      until mysqladmin ping -h 127.0.0.1 -u user -ppassword --silent; do
-        sleep 2
-      done
-      echo "MariaDB OK!"
-
   - name: Clone repositórios
     init: |
       if [ ! -d "frontend" ]; then
@@ -18,62 +9,12 @@ tasks:
       if [ ! -d "backend" ]; then
         git clone https://github.com/carlinhoshk/CAP.git backend
       fi
-
-  - name: Iniciar backend
+  - name: Subir ambiente Docker Compose
     command: |
-      cd backend
-      ./mvnw spring-boot:run
-
-  - name: Iniciar frontend
-    command: |
-      cd frontend
-      docker build -t escola-frontend .
-      docker run -d --name escola_frontend -p 8080:8080 escola-frontend
+      docker compose -f docker-compose.gitpod.yml up --build -d
 
 ports:
   - port: 3000
     onOpen: open-preview
   - port: 8080
     onOpen: open-browser
-
-services:
-  mariadb:
-    image: mariadb:10.11
-    containerName: escola_db
-    environment:
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: escola
-      MARIADB_USER: user
-      MARIADB_PASSWORD: password
-      MARIADB_INNODB_BUFFER_POOL_SIZE: 512M
-      MARIADB_MAX_CONNECTIONS: 50
-      MARIADB_INNODB_LOG_FILE_SIZE: 64M
-      MARIADB_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 2
-      MARIADB_INNODB_FLUSH_METHOD: O_DIRECT
-    ports:
-      - "3306:3306"
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --innodb-buffer-pool-size=512M
-      --innodb-log-file-size=64M
-      --innodb-flush-log-at-trx-commit=2
-      --innodb-flush-method=O_DIRECT
-    healthCheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restartPolicy: unless-stopped
-
-volumes:
-  mariadb_data:
-
-extensions:
-  - vscjava.vscode-java-pack
-  - angular.ng-template
-  - dbaeumer.vscode-eslint
-  - esbenp.prettier-vscode
-  - ms-azuretools.vscode-docker
